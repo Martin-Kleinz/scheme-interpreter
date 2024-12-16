@@ -30,7 +30,8 @@ Value Fixnum::eval(Assoc &e)
 
 Value If::eval(Assoc &e)
 {
-
+    Value v1 = this->cond->eval(e);
+    
 } // if expression
 
 Value True::eval(Assoc &e)
