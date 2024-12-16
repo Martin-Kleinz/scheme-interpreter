@@ -18,28 +18,66 @@ Value Apply::eval(Assoc &e) {} // for function calling
 
 Value Letrec::eval(Assoc &env) {} // letrec expression
 
-Value Var::eval(Assoc &e) {} // evaluation of variable
+Value Var::eval(Assoc &e) 
+{
+    
+} // evaluation of variable
 
 Value Fixnum::eval(Assoc &e) 
 {
     return IntegerV(this->n);
 } // evaluation of a fixnum
 
-Value If::eval(Assoc &e) {} // if expression
+Value If::eval(Assoc &e) 
+{
+
+} // if expression
 
 Value True::eval(Assoc &e) 
 {
-    return Value(new Boolean(true));
+    return BooleanV(true);
 } // evaluation of #t
 
 Value False::eval(Assoc &e) 
 {
-    return Value(new Boolean(false));
+    return BooleanV(false);
 } // evaluation of #f
 
-Value Begin::eval(Assoc &e) {} // begin expression
+Value Begin::eval(Assoc &e) 
+{
 
-Value Quote::eval(Assoc &e) {} // quote expression
+} // begin expression
+
+Value Quote::eval(Assoc &e) 
+{
+    Number* ptr1 = dynamic_cast<Number*>(this->s.get());
+    if(ptr1 != nullptr) return IntegerV(ptr1->n);
+    TrueSyntax* ptr2 = dynamic_cast<TrueSyntax*>(this->s.get());
+    if(ptr2 != nullptr) return BooleanV(true);
+    FalseSyntax* ptr3 = dynamic_cast<FalseSyntax*>(this->s.get());
+    if(ptr3 != nullptr) return BooleanV(false);
+    Identifier* ptr4 = dynamic_cast<Identifier*>(this->s.get());
+    if(ptr4) return SymbolV(ptr4->s);
+    Var* ptr = dynamic_cast<Var*>(this->s.get());
+    if(ptr) return SymbolV(ptr->x);
+    List* ptr5 = dynamic_cast<List*>(this->s.get());
+    if(ptr5) {
+        if (ptr5->stxs.empty()) 
+            return NullV();
+        else 
+        {
+            Quote* qt1 = new Quote(ptr5->stxs[0]);
+            Value first = qt1->eval(e);
+            List* restList = new List();
+            for (auto it = ptr5->stxs.begin() + 1; it != ptr5->stxs.end(); ++it)
+                restList->stxs.push_back(*it);
+            Quote* restQuote = new Quote(restList);
+            Value rest = restQuote->eval(e);
+            return PairV(first, rest);
+        }
+    }
+    throw(RuntimeError(""));
+} // quote expression
 
 Value MakeVoid::eval(Assoc &e) {} // (void)
 
@@ -96,7 +134,10 @@ Value Greater::evalRator(const Value &rand1, const Value &rand2) {} // >
 
 Value IsEq::evalRator(const Value &rand1, const Value &rand2) {} // eq?
 
-Value Cons::evalRator(const Value &rand1, const Value &rand2) {} // cons
+Value Cons::evalRator(const Value &rand1, const Value &rand2) 
+{
+
+} // cons
 
 Value IsBoolean::evalRator(const Value &rand) {} // boolean?
 

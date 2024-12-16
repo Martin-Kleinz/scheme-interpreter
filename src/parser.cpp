@@ -33,10 +33,7 @@ Expr Number :: parse(Assoc &env)
 
 Expr Identifier :: parse(Assoc &env) 
 {
-    if(this->s == "+") return Expr(new Var("+"));
-    if(this->s == "-") return Expr(new Var("-"));
-    if(this->s == "*") return Expr(new Var("*"));
-   // if(this->s == "quote") return Expr(new )
+    return Expr(new Var(this->s));
 }
 
 Expr TrueSyntax :: parse(Assoc &env) 
@@ -51,13 +48,11 @@ Expr FalseSyntax :: parse(Assoc &env)
 
 Expr List :: parse(Assoc &env) 
 {
+    if (this->stxs.empty()) throw(RuntimeError(""));
     Identifier* identifierPtr = dynamic_cast<Identifier*>(this->stxs[0].get());
     if(identifierPtr->s == "quote") 
     {
-        List* stx1 = new List();
-        stx1->stxs = this->stxs;
-        stx1->stxs.erase(stx1->stxs.begin());
-        return Expr(new Quote(stx1));
+        return Expr(new Quote(this->stxs[1]));
     }
     if(this->stxs.size() != 3)
     {
