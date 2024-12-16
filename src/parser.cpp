@@ -86,15 +86,6 @@ Expr List ::parse(Assoc &env)
         if (this->stxs.size() == 1)
             return Expr(new Exit());
         throw(RuntimeError(""));
-    case E_CONS:
-        if (this->stxs.size() != 3)
-            throw(RuntimeError(""));
-        else
-        {
-            Expr expr3 = this->stxs[1].parse(env);
-            Expr expr4 = this->stxs[2].parse(env);
-            return Expr(new Cons(expr3, expr4));
-        }
     case E_CAR:
         if(this->stxs.size() != 2) throw(RuntimeError(""));
         else 
@@ -110,16 +101,29 @@ Expr List ::parse(Assoc &env)
             return Expr(new Cdr(expr));
         }
     }
+    if(this->stxs.size() != 3) throw(RuntimeError(""));
     Expr expr1 = this->stxs[1].parse(env);
     Expr expr2 = this->stxs[2].parse(env);
     switch (primitives[identifierPtr->s])
     {
+    case E_LT:
+        return Expr(new Less(expr1, expr2));
+    case E_LE:
+        return Expr(new LessEq(expr1, expr2));
+    case E_EQ:    
+        return Expr(new Equal(expr1, expr2));
+    case E_GE:    
+        return Expr(new GreaterEq(expr1, expr2));
+    case E_GT:  
+        return Expr(new Greater(expr1, expr2)); 
     case E_PLUS:
         return Expr(new Plus(expr1, expr2));
     case E_MINUS:
         return Expr(new Minus(expr1, expr2));
     case E_MUL:
         return Expr(new Mult(expr1, expr2));
+    case E_CONS:
+        return Expr(new Cons(expr1, expr2));
     }
 }
 

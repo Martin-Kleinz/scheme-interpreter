@@ -139,15 +139,50 @@ Value Minus::evalRator(const Value &rand1, const Value &rand2)
         throw(RuntimeError(""));
 } // -
 
-Value Less::evalRator(const Value &rand1, const Value &rand2) {} // <
+Value Less::evalRator(const Value &rand1, const Value &rand2) 
+{
+    Integer *itg1 = dynamic_cast<Integer*>(rand1.get());
+    Integer *itg2 = dynamic_cast<Integer*>(rand2.get());
+    if(!itg1 || !itg2) throw(RuntimeError(""));
+    if(itg1->n < itg2->n) return BooleanV(true);
+    return BooleanV(false);
+} // <
 
-Value LessEq::evalRator(const Value &rand1, const Value &rand2) {} // <=
+Value LessEq::evalRator(const Value &rand1, const Value &rand2) 
+{
+    Integer *itg1 = dynamic_cast<Integer*>(rand1.get());
+    Integer *itg2 = dynamic_cast<Integer*>(rand2.get());
+    if(!itg1 || !itg2) throw(RuntimeError(""));
+    if(itg1->n <= itg2->n) return BooleanV(true);
+    return BooleanV(false);
+} // <=
 
-Value Equal::evalRator(const Value &rand1, const Value &rand2) {} // =
+Value Equal::evalRator(const Value &rand1, const Value &rand2) 
+{
+    Integer *itg1 = dynamic_cast<Integer*>(rand1.get());
+    Integer *itg2 = dynamic_cast<Integer*>(rand2.get());
+    if(!itg1 || !itg2) throw(RuntimeError(""));
+    if(itg1->n == itg2->n) return BooleanV(true);
+    return BooleanV(false);
+} // =
 
-Value GreaterEq::evalRator(const Value &rand1, const Value &rand2) {} // >=
+Value GreaterEq::evalRator(const Value &rand1, const Value &rand2) 
+{
+    Integer *itg1 = dynamic_cast<Integer*>(rand1.get());
+    Integer *itg2 = dynamic_cast<Integer*>(rand2.get());
+    if(!itg1 || !itg2) throw(RuntimeError(""));
+    if(itg1->n >= itg2->n) return BooleanV(true);
+    return BooleanV(false);
+} // >=
 
-Value Greater::evalRator(const Value &rand1, const Value &rand2) {} // >
+Value Greater::evalRator(const Value &rand1, const Value &rand2) 
+{
+    Integer *itg1 = dynamic_cast<Integer*>(rand1.get());
+    Integer *itg2 = dynamic_cast<Integer*>(rand2.get());
+    if(!itg1 || !itg2) throw(RuntimeError(""));
+    if(itg1->n > itg2->n) return BooleanV(true);
+    return BooleanV(false);
+} // >
 
 Value IsEq::evalRator(const Value &rand1, const Value &rand2) {} // eq?
 
