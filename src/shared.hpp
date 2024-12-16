@@ -2,6 +2,10 @@
 #define SHARED_PTR
 #include <cstddef>
 #include <functional>
+#include <memory>
+
+// template <typename T>
+// using SharedPtr = std::shared_ptr<T>;
 
 template <typename T>
 class SharedPtr
@@ -163,6 +167,6 @@ SharedPtr<T> make_shared(Args &&...args)
 // I think I'd better leave you to design the prototype :)
 
 // template <?>
-//? make_shared(?);
+//? make_shared(?);*/
 
 #endif // SHARED_PTR
