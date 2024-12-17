@@ -31,7 +31,9 @@ Value Fixnum::eval(Assoc &e)
 Value If::eval(Assoc &e)
 {
     Value v1 = this->cond->eval(e);
-    
+    Boolean *blv = dynamic_cast<Boolean*>(v1.get());
+    if(blv && blv->b == false) return this->alter->eval(e);
+    else return this->conseq->eval(e);
 } // if expression
 
 Value True::eval(Assoc &e)
@@ -191,9 +193,19 @@ Value Cons::evalRator(const Value &rand1, const Value &rand2)
     return PairV(rand1, rand2);
 } // cons
 
-Value IsBoolean::evalRator(const Value &rand) {} // boolean?
+Value IsBoolean::evalRator(const Value &rand) 
+{
+    Boolean *bl = dynamic_cast<Boolean*>(rand.get());
+    if(!bl) return BooleanV(false);
+    else return BooleanV(true);
+} // boolean?
 
-Value IsFixnum::evalRator(const Value &rand) {} // fixnum?
+Value IsFixnum::evalRator(const Value &rand) 
+{
+    Integer *fxn = dynamic_cast<Integer*>(rand.get());
+    if(!fxn) return BooleanV(false);
+    else return BooleanV(true);
+} // fixnum?
 
 Value IsSymbol::evalRator(const Value &rand) {} // symbol?
 
