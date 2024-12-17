@@ -20,7 +20,7 @@ Value Letrec::eval(Assoc &env) {} // letrec expression
 
 Value Var::eval(Assoc &e)
 {
-
+    return SymbolV(this->x);
 } // evaluation of variable
 
 Value Fixnum::eval(Assoc &e)
@@ -186,7 +186,11 @@ Value Greater::evalRator(const Value &rand1, const Value &rand2)
     return BooleanV(false);
 } // >
 
-Value IsEq::evalRator(const Value &rand1, const Value &rand2) {} // eq?
+Value IsEq::evalRator(const Value &rand1, const Value &rand2) 
+{
+    if(rand1->v_type != rand2->v_type) return BooleanV(false);
+    
+} // eq?
 
 Value Cons::evalRator(const Value &rand1, const Value &rand2)
 {
@@ -207,15 +211,35 @@ Value IsFixnum::evalRator(const Value &rand)
     else return BooleanV(true);
 } // fixnum?
 
-Value IsSymbol::evalRator(const Value &rand) {} // symbol?
+Value IsSymbol::evalRator(const Value &rand) 
+{
+    Symbol *smb = dynamic_cast<Symbol*>(rand.get());
+    if(!smb) return BooleanV(false);
+    else return BooleanV(true);
+} // symbol?
 
-Value IsNull::evalRator(const Value &rand) {} // null?
+Value IsNull::evalRator(const Value &rand) 
+{
+    Null *nl = dynamic_cast<Null*>(rand.get());
+    if(!nl) return BooleanV(false);
+    else return BooleanV(true);
+} // null?
 
-Value IsPair::evalRator(const Value &rand) {} // pair?
+Value IsPair::evalRator(const Value &rand) 
+{
+    Pair *pr = dynamic_cast<Pair*>(rand.get());
+    if(!pr) return BooleanV(false);
+    else return BooleanV(true);
+} // pair?
 
 Value IsProcedure::evalRator(const Value &rand) {} // procedure?
 
-Value Not::evalRator(const Value &rand) {} // not
+Value Not::evalRator(const Value &rand) 
+{
+    Boolean *bl = dynamic_cast<Boolean*>(rand.get());
+    if(bl && bl->b == true) return BooleanV(false);
+    else return BooleanV(true);
+} // not
 
 Value Car::evalRator(const Value &rand) 
 {
