@@ -199,36 +199,31 @@ Value Cons::evalRator(const Value &rand1, const Value &rand2)
 
 Value IsBoolean::evalRator(const Value &rand) 
 {
-    Boolean *bl = dynamic_cast<Boolean*>(rand.get());
-    if(!bl) return BooleanV(false);
+    if(rand->v_type != V_BOOL) return BooleanV(false);
     else return BooleanV(true);
 } // boolean?
 
 Value IsFixnum::evalRator(const Value &rand) 
 {
-    Integer *fxn = dynamic_cast<Integer*>(rand.get());
-    if(!fxn) return BooleanV(false);
+    if(rand->v_type != V_INT) return BooleanV(false);
     else return BooleanV(true);
 } // fixnum?
 
 Value IsSymbol::evalRator(const Value &rand) 
 {
-    Symbol *smb = dynamic_cast<Symbol*>(rand.get());
-    if(!smb) return BooleanV(false);
+    if(rand->v_type != V_SYM) return BooleanV(false);
     else return BooleanV(true);
 } // symbol?
 
 Value IsNull::evalRator(const Value &rand) 
 {
-    Null *nl = dynamic_cast<Null*>(rand.get());
-    if(!nl) return BooleanV(false);
+    if(rand->v_type != V_NULL) return BooleanV(false);
     else return BooleanV(true);
 } // null?
 
 Value IsPair::evalRator(const Value &rand) 
 {
-    Pair *pr = dynamic_cast<Pair*>(rand.get());
-    if(!pr) return BooleanV(false);
+    if(rand->v_type != V_PAIR) return BooleanV(false);
     else return BooleanV(true);
 } // pair?
 

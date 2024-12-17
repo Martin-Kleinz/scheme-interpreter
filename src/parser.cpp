@@ -115,8 +115,12 @@ Expr List ::parse(Assoc &env)
     case E_PAIRQ:
         if(this->stxs.size() != 2) throw(RuntimeError(""));
         return Expr(new IsPair(this->stxs[1].parse(env)));
- //   case E_EQ:
-        
+    case E_NOT:
+        if(this->stxs.size() != 2) throw(RuntimeError(""));
+        return Expr(new Not(this->stxs[1].parse(env)));
+    case E_EQ:
+        if(this->stxs.size() != 3) throw(RuntimeError(""));
+        return Expr(new IsEq(this->stxs[1].parse(env), this->stxs[2].parse(env)));
     }
     if(this->stxs.size() != 3) throw(RuntimeError(""));
     Expr expr1 = this->stxs[1].parse(env);
