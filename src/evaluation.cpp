@@ -20,8 +20,6 @@ Value Letrec::eval(Assoc &env) {} // letrec expression
 
 Value Var::eval(Assoc &e)
 {
-    if (this->x == ".")
-        return Value(nullptr);
     return SymbolV(this->x);
 } // evaluation of variable
 
@@ -71,11 +69,7 @@ Value Quote::eval(Assoc &e)
         return SymbolV(ptr4->s);
     Var *ptr = dynamic_cast<Var *>(this->s.get());
     if (ptr)
-    {
-        if (ptr->x == ".")
-            return Value(nullptr);
         return SymbolV(ptr->x);
-    }
     List *ptr5 = dynamic_cast<List *>(this->s.get());
     if (ptr5)
     {
@@ -83,6 +77,14 @@ Value Quote::eval(Assoc &e)
             return NullV();
         else
         {
+            Identifier *id = dynamic_cast<Identifier*>(ptr5->stxs[0].get());
+            if(id && id->s == ".")
+            {
+                if(ptr5->stxs.size() != 2) throw(RuntimeError(""));
+                Quote *rest = new Quote(ptr5->stxs[1]);
+                Value r = rest->eval(e);
+                return r;
+            }
             Quote *qt1 = new Quote(ptr5->stxs[0]);
             Value first = qt1->eval(e);
             List *restList = new List();
