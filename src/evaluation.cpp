@@ -291,10 +291,10 @@ Value IsProcedure::evalRator(const Value &rand) {} // procedure?
 Value Not::evalRator(const Value &rand)
 {
     Boolean *bl = dynamic_cast<Boolean *>(rand.get());
-    if (bl && bl->b == true)
-        return BooleanV(false);
-    else
+    if (bl && bl->b == false)
         return BooleanV(true);
+    else
+        return BooleanV(false);
 } // not
 
 Value Car::evalRator(const Value &rand)
