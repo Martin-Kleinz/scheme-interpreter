@@ -40,7 +40,8 @@ Expr Number ::parse(Assoc &env)
 
 Expr Identifier ::parse(Assoc &env)
 {
-    return Expr(new Var(this->s));
+    // to do
+    throw(RuntimeError(""));
 }
 
 Expr TrueSyntax ::parse(Assoc &env)
