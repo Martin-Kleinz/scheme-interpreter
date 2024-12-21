@@ -21,7 +21,7 @@ Value Letrec::eval(Assoc &env) {} // letrec expression
 Value Var::eval(Assoc &e)
 {
     // to do
-    return SymbolV(this->x);
+    throw(RuntimeError(""));
 } // evaluation of variable
 
 Value Fixnum::eval(Assoc &e)
