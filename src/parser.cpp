@@ -83,6 +83,7 @@ Expr List ::parse(Assoc &env)
     switch (primitives[identifierPtr->s])
     {
     case E_VOID:
+        if(this->stxs.size() != 1) throw(RuntimeError(""));
         return new MakeVoid();
     case E_EXIT:
         if (this->stxs.size() == 1)
