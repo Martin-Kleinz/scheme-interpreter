@@ -122,6 +122,7 @@ Expr List ::parse(Assoc &env)
         if(this->stxs.size() != 3) throw(RuntimeError(""));
         return Expr(new IsEq(this->stxs[1].parse(env), this->stxs[2].parse(env)));
     case E_PROCQ:
+    
         break;
     }
     if(this->stxs.size() != 3) throw(RuntimeError(""));

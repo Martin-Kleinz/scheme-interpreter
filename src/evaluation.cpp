@@ -20,6 +20,7 @@ Value Letrec::eval(Assoc &env) {} // letrec expression
 
 Value Var::eval(Assoc &e)
 {
+    // to do
     return SymbolV(this->x);
 } // evaluation of variable
 
@@ -67,9 +68,6 @@ Value Quote::eval(Assoc &e)
     Identifier *ptr4 = dynamic_cast<Identifier *>(this->s.get());
     if (ptr4)
         return SymbolV(ptr4->s);
-    Var *ptr = dynamic_cast<Var *>(this->s.get());
-    if (ptr)
-        return SymbolV(ptr->x);
     List *ptr5 = dynamic_cast<List *>(this->s.get());
     if (ptr5)
     {
