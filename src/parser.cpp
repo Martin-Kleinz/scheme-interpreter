@@ -30,6 +30,7 @@ Expr Syntax ::parse(Assoc &env)
     if(tstx) return tstx->parse(env);
     Identifier *idtf = dynamic_cast<Identifier*>(this->get());
     if(idtf) return idtf->parse(env);
+    throw(RuntimeError(""));
 }
 
 Expr Number ::parse(Assoc &env)
@@ -122,7 +123,7 @@ Expr List ::parse(Assoc &env)
         if(this->stxs.size() != 3) throw(RuntimeError(""));
         return Expr(new IsEq(this->stxs[1].parse(env), this->stxs[2].parse(env)));
     case E_PROCQ:
-    
+
         break;
     }
     if(this->stxs.size() != 3) throw(RuntimeError(""));
@@ -149,6 +150,7 @@ Expr List ::parse(Assoc &env)
     case E_CONS:
         return Expr(new Cons(expr1, expr2));
     }
+    throw(RuntimeError(""));
 }
 
 #endif
