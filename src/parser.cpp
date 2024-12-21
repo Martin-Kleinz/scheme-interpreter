@@ -64,6 +64,7 @@ Expr List ::parse(Assoc &env)
     switch (reserved_words[identifierPtr->s])
     {
     case E_QUOTE:
+        if(this->stxs.size() != 2) throw(RuntimeError(""));
         return Expr(new Quote(this->stxs[1]));
     case E_BEGIN:
         for(int i = 1; i < this->stxs.size(); ++i)
