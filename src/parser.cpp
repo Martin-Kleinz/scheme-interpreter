@@ -67,6 +67,7 @@ Expr List ::parse(Assoc &env)
         if(this->stxs.size() != 2) throw(RuntimeError(""));
         return Expr(new Quote(this->stxs[1]));
     case E_BEGIN:
+        if(this->stxs.size() < 2) throw(RuntimeError(""));
         for(int i = 1; i < this->stxs.size(); ++i)
         {
             Expr expr = this->stxs[i].parse(env);
