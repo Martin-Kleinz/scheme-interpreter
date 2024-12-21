@@ -40,8 +40,11 @@ Expr Number ::parse(Assoc &env)
 
 Expr Identifier ::parse(Assoc &env)
 {
-    // to do
-    throw(RuntimeError(""));
+    if(this->s[0] == '.' || this->s[0] == '@' ) throw(RuntimeError(""));
+    if(this->s[0] >= '0' && this->s[0] <= '9') throw(RuntimeError(""));
+    for(int i = 0; i < this->s.size(); ++i)
+    if(this->s[i] == '#' || this->s[i] == '\'' || this->s[i] == '"') throw(RuntimeError(""));
+    return Expr(new Var(this->s));
 }
 
 Expr TrueSyntax ::parse(Assoc &env)
@@ -71,6 +74,8 @@ Expr List ::parse(Assoc &env)
         if(this->stxs.size() < 2) throw(RuntimeError(""));
         for(int i = 1; i < this->stxs.size(); ++i)
         {
+            Identifier *id = dynamic_cast<Identifier*>(this->stxs[i].get());
+            if(id) throw(RuntimeError(""));
             Expr expr = this->stxs[i].parse(env);
             bg.push_back(expr);
         }
@@ -127,8 +132,9 @@ Expr List ::parse(Assoc &env)
         if(this->stxs.size() != 3) throw(RuntimeError(""));
         return Expr(new IsEq(this->stxs[1].parse(env), this->stxs[2].parse(env)));
     case E_PROCQ:
-
-        break;
+        if(this->stxs.size() != 2) throw(RuntimeError(""));
+        Expr ep = this->stxs[1].parse(env);
+        return Expr(new IsProcedure(ep));
     }
     if(this->stxs.size() != 3) throw(RuntimeError(""));
     Expr expr1 = this->stxs[1].parse(env);
