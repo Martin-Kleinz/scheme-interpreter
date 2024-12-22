@@ -63,8 +63,21 @@ Expr List ::parse(Assoc &env)
         throw(RuntimeError(""));
     Identifier *identifierPtr = dynamic_cast<Identifier *>(this->stxs[0].get());
     if (!identifierPtr)
-        throw(RuntimeError(""));
-    std::vector<Expr> bg;    
+    {
+        Expr l = this->stxs[0].parse(env);
+        Lambda *lbd = dynamic_cast<Lambda*>(l.get());
+        if(!lbd || lbd->x.size() != this->stxs.size() - 1) throw(RuntimeError(""));
+        std::vector<Expr> rd;
+        for(int i = 1; i < this->stxs.size(); ++i)
+        {
+            Expr ex = this->stxs[i].parse(env);
+            rd.push_back(ex);
+        }
+        return Expr(new Apply(lbd, rd));
+    }
+    std::vector<Expr> bg; 
+    std::vector<std::string> para;  
+    Expr body = nullptr, expr1 = nullptr, expr2 = nullptr, expr3 = nullptr;
     switch (reserved_words[identifierPtr->s])
     {
     case E_QUOTE:
@@ -82,10 +95,25 @@ Expr List ::parse(Assoc &env)
         return Expr(new Begin(bg));
     case E_IF:
         if(this->stxs.size() != 4) throw(RuntimeError(""));
-        Expr expr1 = this->stxs[1].parse(env);
-        Expr expr2 = this->stxs[2].parse(env);
-        Expr expr3 = this->stxs[3].parse(env);
-        return Expr(new If(expr1, expr2, expr3));
+        expr1 = this->stxs[1].parse(env);
+        expr2 = this->stxs[2].parse(env);
+        expr3 = this->stxs[3].parse(env);
+        return Expr(new If(expr1, expr2, expr3));    
+    case E_LAMBDA:
+        if(this->stxs.size() != 3) throw(RuntimeError(""));
+        List *p = dynamic_cast<List*>(this->stxs[1].get());
+        if(!p) throw(RuntimeError(""));
+        for(int i = 0; i < p->stxs.size(); ++i)
+        {
+            Identifier *id = dynamic_cast<Identifier*>(p->stxs[i].get());
+            if(!id) throw(RuntimeError(""));
+            para.push_back(id->s);
+        }
+        body = this->stxs[2].parse(env);
+        return Expr(new Lambda(para, body));
+    // case E_LET:
+    //     if(this->stxs.size() != 3) throw(RuntimeError(""));    
+    //     break;    
     }
     switch (primitives[identifierPtr->s])
     {
@@ -137,8 +165,8 @@ Expr List ::parse(Assoc &env)
         return Expr(new IsProcedure(ep));
     }
     if(this->stxs.size() != 3) throw(RuntimeError(""));
-    Expr expr1 = this->stxs[1].parse(env);
-    Expr expr2 = this->stxs[2].parse(env);
+    expr1 = this->stxs[1].parse(env);
+    expr2 = this->stxs[2].parse(env);
     switch (primitives[identifierPtr->s])
     {
     case E_LT:

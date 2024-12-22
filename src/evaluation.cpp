@@ -12,15 +12,54 @@ extern std ::map<std ::string, ExprType> reserved_words;
 
 Value Let::eval(Assoc &env) {} // let expression
 
-Value Lambda::eval(Assoc &env) {} // lambda expression
+Value Lambda::eval(Assoc &env) 
+{
+    return ClosureV(this->x, this->e, env);
+} // lambda expression
 
-Value Apply::eval(Assoc &e) {} // for function calling
+Value Apply::eval(Assoc &e) 
+{
+    Lambda *lbd = dynamic_cast<Lambda*>(this->rator.get());
+    Assoc current = e;
+    for(int i = 0; i < this->rand.size(); ++i)
+    {
+        Value v = this->rand[i]->eval(e);
+        Assoc now(new AssocList(lbd->x[i], v, current));
+        current = now;
+    }
+    return lbd->e->eval(current);
+} // for function calling
 
-Value Letrec::eval(Assoc &env) {} // letrec expression
+Value Letrec::eval(Assoc &env) 
+{
+    
+} // letrec expression
 
 Value Var::eval(Assoc &e)
 {
     // to do
+    Assoc current = e;
+    while (current.get() != nullptr)
+    {
+        AssocList *node = current.get();
+        if (node->x == this->x)
+            return node->v;
+        current = node->next;
+    }
+    std::vector<std::string> s;
+    s.push_back("x");
+    s.push_back("y");
+    AssocList * asl = new AssocList(s[1], IntegerV(0), e);
+    Assoc b(asl);
+    AssocList *as = new AssocList(s[0], IntegerV(0), b);
+    Assoc a(as); 
+    switch (primitives[this->x])
+    {
+    case E_PLUS:
+        Var *x = new Var(s[0]), *y = new Var(s[1]);
+        return ClosureV(s, Expr(new Plus(x, y)), a);
+
+    }
     throw(RuntimeError(""));
 } // evaluation of variable
 
@@ -75,10 +114,11 @@ Value Quote::eval(Assoc &e)
             return NullV();
         else
         {
-            Identifier *id = dynamic_cast<Identifier*>(ptr5->stxs[0].get());
-            if(id && id->s == ".")
+            Identifier *id = dynamic_cast<Identifier *>(ptr5->stxs[0].get());
+            if (id && id->s == ".")
             {
-                if(ptr5->stxs.size() != 2) throw(RuntimeError(""));
+                if (ptr5->stxs.size() != 2)
+                    throw(RuntimeError(""));
                 Quote *rest = new Quote(ptr5->stxs[1]);
                 Value r = rest->eval(e);
                 return r;
@@ -284,7 +324,12 @@ Value IsPair::evalRator(const Value &rand)
         return BooleanV(true);
 } // pair?
 
-Value IsProcedure::evalRator(const Value &rand) {} // procedure?
+Value IsProcedure::evalRator(const Value &rand)
+{
+    Closure *clo = dynamic_cast<Closure*>(rand.get());
+    if(clo) return BooleanV(true);
+    else return BooleanV(false);
+} // procedure?
 
 Value Not::evalRator(const Value &rand)
 {
