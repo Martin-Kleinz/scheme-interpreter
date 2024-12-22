@@ -73,7 +73,7 @@ Expr List ::parse(Assoc &env)
             Expr ex = this->stxs[i].parse(env);
             rd.push_back(ex);
         }
-        return Expr(new Apply(lbd, rd));
+        return Expr(new Apply(Expr(lbd), rd));
     }
     std::vector<Expr> bg; 
     std::vector<std::string> para;  

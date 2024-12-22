@@ -10,7 +10,10 @@
 extern std ::map<std ::string, ExprType> primitives;
 extern std ::map<std ::string, ExprType> reserved_words;
 
-Value Let::eval(Assoc &env) {} // let expression
+Value Let::eval(Assoc &env) 
+{
+    
+} // let expression
 
 Value Lambda::eval(Assoc &env) 
 {
@@ -19,7 +22,9 @@ Value Lambda::eval(Assoc &env)
 
 Value Apply::eval(Assoc &e) 
 {
+    std::cout <<" aesfawef" << std::endl;
     Lambda *lbd = dynamic_cast<Lambda*>(this->rator.get());
+    if(!lbd || lbd->x.size() != this->rand.size()) throw(RuntimeError(""));
     Assoc current = e;
     for(int i = 0; i < this->rand.size(); ++i)
     {
@@ -32,7 +37,7 @@ Value Apply::eval(Assoc &e)
 
 Value Letrec::eval(Assoc &env) 
 {
-    
+
 } // letrec expression
 
 Value Var::eval(Assoc &e)
@@ -46,20 +51,20 @@ Value Var::eval(Assoc &e)
             return node->v;
         current = node->next;
     }
-    std::vector<std::string> s;
-    s.push_back("x");
-    s.push_back("y");
-    AssocList * asl = new AssocList(s[1], IntegerV(0), e);
-    Assoc b(asl);
-    AssocList *as = new AssocList(s[0], IntegerV(0), b);
-    Assoc a(as); 
-    switch (primitives[this->x])
-    {
-    case E_PLUS:
-        Var *x = new Var(s[0]), *y = new Var(s[1]);
-        return ClosureV(s, Expr(new Plus(x, y)), a);
+    // std::vector<std::string> s;
+    // s.push_back("x");
+    // s.push_back("y");
+    // AssocList * asl = new AssocList(s[1], IntegerV(0), e);
+    // Assoc b(asl);
+    // AssocList *as = new AssocList(s[0], IntegerV(0), b);
+    // Assoc a(as); 
+    // switch (primitives[this->x])
+    // {
+    // case E_PLUS:
+    //     Var *x = new Var(s[0]), *y = new Var(s[1]);
+    //     return ClosureV(s, Expr(new Plus(x, y)), a);
 
-    }
+    // }
     throw(RuntimeError(""));
 } // evaluation of variable
 
