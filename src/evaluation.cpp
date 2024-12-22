@@ -22,7 +22,7 @@ Value Lambda::eval(Assoc &env)
 
 Value Apply::eval(Assoc &e) 
 {
-    std::cout <<" aesfawef" << std::endl;
+    if(!this->rator.get()) throw(RuntimeError(""));
     Lambda *lbd = dynamic_cast<Lambda*>(this->rator.get());
     if(!lbd || lbd->x.size() != this->rand.size()) throw(RuntimeError(""));
     Assoc current = e;
