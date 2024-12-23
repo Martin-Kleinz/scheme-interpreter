@@ -164,6 +164,22 @@ Expr List ::parse(Assoc &env)
         Expr ep = this->stxs[1].parse(env);
         return Expr(new IsProcedure(ep));
     }
+    Expr vr = this->stxs[0].parse(env);
+    Var *v = dynamic_cast<Var*>(vr.get());
+    if(!v) throw(RuntimeError(""));
+    std::vector<Expr> es;
+    for(int i = 1; i < this->stxs.size(); ++i)
+    {
+        Expr e = this->stxs[i].parse(env);
+        es.push_back(e);
+    }
+    switch (primitives[v->x])
+    {
+    case E_PLUS:
+    case E_MINUS:
+    case E_MUL:
+        return Expr(new Apply(vr, es));
+    }
     if(this->stxs.size() != 3) throw(RuntimeError(""));
     expr1 = this->stxs[1].parse(env);
     expr2 = this->stxs[2].parse(env);
@@ -179,12 +195,6 @@ Expr List ::parse(Assoc &env)
         return Expr(new GreaterEq(expr1, expr2));
     case E_GT:  
         return Expr(new Greater(expr1, expr2)); 
-    case E_PLUS:
-        return Expr(new Plus(expr1, expr2));
-    case E_MINUS:
-        return Expr(new Minus(expr1, expr2));
-    case E_MUL:
-        return Expr(new Mult(expr1, expr2));
     case E_CONS:
         return Expr(new Cons(expr1, expr2));
     }
