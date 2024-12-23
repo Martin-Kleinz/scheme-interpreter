@@ -173,31 +173,33 @@ Expr List ::parse(Assoc &env)
         Expr e = this->stxs[i].parse(env);
         es.push_back(e);
     }
-    switch (primitives[v->x])
-    {
-    case E_PLUS:
-    case E_MINUS:
-    case E_MUL:
-        return Expr(new Apply(vr, es));
-    }
-    if(this->stxs.size() != 3) throw(RuntimeError(""));
-    expr1 = this->stxs[1].parse(env);
-    expr2 = this->stxs[2].parse(env);
-    switch (primitives[identifierPtr->s])
-    {
-    case E_LT:
-        return Expr(new Less(expr1, expr2));
-    case E_LE:
-        return Expr(new LessEq(expr1, expr2));
-    case E_EQ:    
-        return Expr(new Equal(expr1, expr2));
-    case E_GE:    
-        return Expr(new GreaterEq(expr1, expr2));
-    case E_GT:  
-        return Expr(new Greater(expr1, expr2)); 
-    case E_CONS:
-        return Expr(new Cons(expr1, expr2));
-    }
+    if(primitives.find(v->x) != primitives.end())
+    return Expr(new Apply(vr, es));
+    // switch (primitives[v->x])
+    // {
+    // case E_PLUS:
+    // case E_MINUS:
+    // case E_MUL:
+    //     return Expr(new Apply(vr, es));
+    // }
+    // if(this->stxs.size() != 3) throw(RuntimeError(""));
+    // expr1 = this->stxs[1].parse(env);
+    // expr2 = this->stxs[2].parse(env);
+    // switch (primitives[identifierPtr->s])
+    // {
+    // case E_LT:
+    //     return Expr(new Less(expr1, expr2));
+    // case E_LE:
+    //     return Expr(new LessEq(expr1, expr2));
+    // case E_EQ:    
+    //     return Expr(new Equal(expr1, expr2));
+    // case E_GE:    
+    //     return Expr(new GreaterEq(expr1, expr2));
+    // case E_GT:  
+    //     return Expr(new Greater(expr1, expr2)); 
+    // case E_CONS:
+    //     return Expr(new Cons(expr1, expr2));
+    // }
     throw(RuntimeError(""));
 }
 

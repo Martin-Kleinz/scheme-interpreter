@@ -67,6 +67,24 @@ Value Var::eval(Assoc &e)
     case E_MUL:
         Body = Expr(new Mult(Expr(new Var("x")), Expr(new Var("y"))));
         return ClosureV(Params, Body, e);
+    case E_LT:
+        Body = Expr(new Less(Expr(new Var("x")), Expr(new Var("y"))));
+        return ClosureV(Params, Body, e);
+    case E_LE:
+        Body = Expr(new LessEq(Expr(new Var("x")), Expr(new Var("y"))));
+        return ClosureV(Params, Body, e);
+    case E_EQ:
+        Body = Expr(new Equal(Expr(new Var("x")), Expr(new Var("y"))));
+        return ClosureV(Params, Body, e);
+    case E_GE:
+        Body = Expr(new GreaterEq(Expr(new Var("x")), Expr(new Var("y"))));
+        return ClosureV(Params, Body, e);
+    case E_GT:
+        Body = Expr(new Greater(Expr(new Var("x")), Expr(new Var("y"))));
+        return ClosureV(Params, Body, e);
+    case E_CONS:
+        Body = Expr(new Cons(Expr(new Var("x")), Expr(new Var("y"))));
+        return ClosureV(Params, Body, e);
     }
     throw(RuntimeError(""));
 } // evaluation of variable
