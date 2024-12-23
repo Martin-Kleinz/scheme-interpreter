@@ -85,6 +85,14 @@ Value Var::eval(Assoc &e)
     case E_CONS:
         Body = Expr(new Cons(Expr(new Var("x")), Expr(new Var("y"))));
         return ClosureV(Params, Body, e);
+    case E_VOID:
+        Params.clear();
+        Body = Expr(new MakeVoid());
+        return ClosureV(Params, Body, e);
+    case E_EXIT:
+        Params.clear();
+        Body = Expr(new Exit());
+        return ClosureV(Params, Body, e);
     }
     throw(RuntimeError(""));
 } // evaluation of variable

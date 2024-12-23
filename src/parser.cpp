@@ -117,13 +117,13 @@ Expr List ::parse(Assoc &env)
     }
     switch (primitives[identifierPtr->s])
     {
-    case E_VOID:
-        if(this->stxs.size() != 1) throw(RuntimeError(""));
-        return new MakeVoid();
-    case E_EXIT:
-        if (this->stxs.size() == 1)
-            return Expr(new Exit());
-        throw(RuntimeError(""));
+    // case E_VOID:
+    //     if(this->stxs.size() != 1) throw(RuntimeError(""));
+    //     return new MakeVoid();
+    // case E_EXIT:
+    //     if (this->stxs.size() == 1)
+    //         return Expr(new Exit());
+    //     throw(RuntimeError(""));
     case E_CAR:
         if(this->stxs.size() != 2) throw(RuntimeError(""));
         else 
