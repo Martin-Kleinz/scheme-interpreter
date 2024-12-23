@@ -7,6 +7,7 @@
 #include "Def.hpp"
 #include "syntax.hpp"
 #include "expr.hpp"
+#include "value.hpp"
 #include <map>
 #include <cstring>
 #include <iostream>
@@ -69,6 +70,7 @@ Expr List ::parse(Assoc &env)
 {
     // if (this->stxs.empty())
     //     throw(RuntimeError(""));
+    Assoc current = env;
     Identifier *identifierPtr = dynamic_cast<Identifier *>(this->stxs[0].get());
     if (!identifierPtr)
     {
@@ -87,8 +89,7 @@ Expr List ::parse(Assoc &env)
     std::vector<std::pair<std::string, Expr>> bind;
     std::vector<Expr> bg;
     std::vector<std::string> para;
-    Expr body = nullptr, bd = nullptr, expr1 = nullptr, expr2 = nullptr, expr3 = nullptr;
-    List *p = nullptr, *lsts = nullptr;
+    Expr expr1 = nullptr, expr2 = nullptr, expr3 = nullptr;
     switch (reserved_words[identifierPtr->s])
     {
     case E_QUOTE:
@@ -111,41 +112,46 @@ Expr List ::parse(Assoc &env)
         expr2 = this->stxs[2].parse(env);
         expr3 = this->stxs[3].parse(env);
         return Expr(new If(expr1, expr2, expr3));
-    case E_LAMBDA:
+    default:
+        break;
+    }
+    if(identifierPtr->s == "lambda")
+    {
         if (this->stxs.size() != 3)
             throw(RuntimeError(""));
-        p = dynamic_cast<List *>(this->stxs[1].get());
+        List *p = dynamic_cast<List *>(this->stxs[1].get());
         if (!p)
             throw(RuntimeError(""));
         for (int i = 0; i < p->stxs.size(); ++i)
         {
-            Identifier *id = dynamic_cast<Identifier *>(p->stxs[i].get());
-            if (!id)
-                throw(RuntimeError(""));
-            para.push_back(id->s);
+            Expr vr = p->stxs[i].parse(env);
+            Var *v = dynamic_cast<Var*>(vr.get());
+            Assoc now(new AssocList(v->x, NullV(), current));
+            current = now;
+            para.push_back(v->x);
         }
-        body = this->stxs[2].parse(env);
+        Expr body = this->stxs[2].parse(current);
         return Expr(new Lambda(para, body));
-    default:
-        break;
     }
     if(identifierPtr->s == "let")
     {
         if (this->stxs.size() != 3)
             throw(RuntimeError(""));
-        bd = this->stxs[2].parse(env);
-        lsts = dynamic_cast<List *>(this->stxs[1].get());
+        List *lsts = dynamic_cast<List *>(this->stxs[1].get());
         if (!lsts) throw(RuntimeError(""));
         for (int i = 0; i < lsts->stxs.size(); ++i)
         {
             List *ls = dynamic_cast<List *>(lsts->stxs[i].get());
             if (!ls || ls->stxs.size() != 2)
                 throw(RuntimeError(""));
-            Identifier *varId = dynamic_cast<Identifier *>(ls->stxs[0].get());
+            Var *varId = dynamic_cast<Var *>(ls->stxs[0].get());
             if (!varId) throw(RuntimeError(""));
+            Assoc now(new AssocList(varId->x, NullV(), current));
+            current = now;
             Expr ex = ls->stxs[1].parse(env);
-            bind.push_back({varId->s, ex});
+            bind.push_back({varId->x, ex});
         }
+        Expr bd = this->stxs[2].parse(current);
         return Expr(new Let(bind, bd));
     }
     // switch (primitives[identifierPtr->s])

@@ -25,7 +25,8 @@ Value Let::eval(Assoc &env)
 
 Value Lambda::eval(Assoc &env)
 {
-    return ClosureV(this->x, this->e, env);
+    Assoc now = env;
+    return ClosureV(this->x, this->e, now);
 } // lambda expression
 
 Value Apply::eval(Assoc &e)
@@ -139,7 +140,7 @@ Value Var::eval(Assoc &e)
     case E_CDR:
         Params.pop_back();
         Body = Expr(new Cdr(new Var("x")));
-        return ClosureV(Params, Body, e);      
+        return ClosureV(Params, Body, e);        
     }
     throw(RuntimeError(""));
 } // evaluation of variable
