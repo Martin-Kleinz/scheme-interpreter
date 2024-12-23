@@ -12,7 +12,15 @@ extern std ::map<std ::string, ExprType> reserved_words;
 
 Value Let::eval(Assoc &env)
 {
-
+    Assoc current = env;
+    for(int i = 0; i < this->bind.size(); ++i)
+    {
+        Expr ep = this->bind[i].second;
+        Value v = ep->eval(env);
+        Assoc now(new AssocList(this->bind[i].first, v, current));
+        current = now;
+    }
+    return this->body->eval(current);
 } // let expression
 
 Value Lambda::eval(Assoc &env)
@@ -163,6 +171,8 @@ Value False::eval(Assoc &e)
 
 Value Begin::eval(Assoc &e)
 {
+    for(int i = 0; i < this->es.size() - 1; ++i)
+        this->es[i]->eval(e);
     return this->es.back()->eval(e);
 } // begin expression
 
@@ -246,10 +256,8 @@ Value Plus::evalRator(const Value &rand1, const Value &rand2)
 {
     Integer *Ptr1 = dynamic_cast<Integer *>(rand1.get());
     Integer *Ptr2 = dynamic_cast<Integer *>(rand2.get());
-    if (Ptr1 != nullptr && Ptr2 != nullptr)
-        return IntegerV(Ptr1->n + Ptr2->n);
-    else
-        throw(RuntimeError(""));
+    if (!Ptr1 || !Ptr2) throw(RuntimeError(""));
+    return IntegerV(Ptr1->n + Ptr2->n);      
 } // +
 
 Value Minus::evalRator(const Value &rand1, const Value &rand2)

@@ -21,15 +21,20 @@ extern std ::map<std ::string, ExprType> reserved_words;
 Expr Syntax ::parse(Assoc &env)
 {
     List *p1 = dynamic_cast<List *>(this->get());
-    if (p1) return p1->parse(env);
+    if (p1)
+        return p1->parse(env);
     Number *p = dynamic_cast<Number *>(this->get());
-    if (p) return p->parse(env);
-    FalseSyntax *fstx = dynamic_cast<FalseSyntax*>(this->get());
-    if(fstx) return fstx->parse(env);
-    TrueSyntax *tstx = dynamic_cast<TrueSyntax*>(this->get());
-    if(tstx) return tstx->parse(env);
-    Identifier *idtf = dynamic_cast<Identifier*>(this->get());
-    if(idtf) return idtf->parse(env);
+    if (p)
+        return p->parse(env);
+    FalseSyntax *fstx = dynamic_cast<FalseSyntax *>(this->get());
+    if (fstx)
+        return fstx->parse(env);
+    TrueSyntax *tstx = dynamic_cast<TrueSyntax *>(this->get());
+    if (tstx)
+        return tstx->parse(env);
+    Identifier *idtf = dynamic_cast<Identifier *>(this->get());
+    if (idtf)
+        return idtf->parse(env);
     throw(RuntimeError(""));
 }
 
@@ -40,10 +45,13 @@ Expr Number ::parse(Assoc &env)
 
 Expr Identifier ::parse(Assoc &env)
 {
-    if(this->s[0] == '.' || this->s[0] == '@' ) throw(RuntimeError(""));
-    if(this->s[0] >= '0' && this->s[0] <= '9') throw(RuntimeError(""));
-    for(int i = 0; i < this->s.size(); ++i)
-    if(this->s[i] == '#' || this->s[i] == '\'' || this->s[i] == '"') throw(RuntimeError(""));
+    if (this->s[0] == '.' || this->s[0] == '@')
+        throw(RuntimeError(""));
+    if (this->s[0] >= '0' && this->s[0] <= '9')
+        throw(RuntimeError(""));
+    for (int i = 0; i < this->s.size(); ++i)
+        if (this->s[i] == '#' || this->s[i] == '\'' || this->s[i] == '"')
+            throw(RuntimeError(""));
     return Expr(new Var(this->s));
 }
 
@@ -59,61 +67,85 @@ Expr FalseSyntax ::parse(Assoc &env)
 
 Expr List ::parse(Assoc &env)
 {
-    if (this->stxs.empty())
-        throw(RuntimeError(""));
+    // if (this->stxs.empty())
+    //     throw(RuntimeError(""));
     Identifier *identifierPtr = dynamic_cast<Identifier *>(this->stxs[0].get());
     if (!identifierPtr)
     {
-        List *lst = dynamic_cast<List*>(this->stxs[0].get());
-        if(!lst) throw(RuntimeError(""));
+        List *lst = dynamic_cast<List *>(this->stxs[0].get());
+        if (!lst)
+            throw(RuntimeError(""));
         Expr l = this->stxs[0].parse(env);
         std::vector<Expr> eps;
-        for(int i = 1; i < this->stxs.size(); ++i)
+        for (int i = 1; i < this->stxs.size(); ++i)
         {
             Expr ep = this->stxs[i].parse(env);
             eps.push_back(ep);
         }
         return Expr(new Apply(l, eps));
     }
-    std::vector<Expr> bg; 
-    std::vector<std::string> para;  
+    std::vector<std::pair<std::string, Expr>> bind;
+    std::vector<Expr> bg;
+    std::vector<std::string> para;
     Expr body = nullptr, expr1 = nullptr, expr2 = nullptr, expr3 = nullptr;
+    List *p = nullptr;
     switch (reserved_words[identifierPtr->s])
     {
     case E_QUOTE:
-        if(this->stxs.size() != 2) throw(RuntimeError(""));
+        if (this->stxs.size() != 2)
+            throw(RuntimeError(""));
         return Expr(new Quote(this->stxs[1]));
     case E_BEGIN:
-        if(this->stxs.size() < 2) throw(RuntimeError(""));
-        for(int i = 1; i < this->stxs.size(); ++i)
+        if (this->stxs.size() < 2)
+            throw(RuntimeError(""));
+        for (int i = 1; i < this->stxs.size(); ++i)
         {
-            Identifier *id = dynamic_cast<Identifier*>(this->stxs[i].get());
-            if(id) throw(RuntimeError(""));
             Expr expr = this->stxs[i].parse(env);
             bg.push_back(expr);
         }
         return Expr(new Begin(bg));
     case E_IF:
-        if(this->stxs.size() != 4) throw(RuntimeError(""));
+        if (this->stxs.size() != 4)
+            throw(RuntimeError(""));
         expr1 = this->stxs[1].parse(env);
         expr2 = this->stxs[2].parse(env);
         expr3 = this->stxs[3].parse(env);
-        return Expr(new If(expr1, expr2, expr3));    
+        return Expr(new If(expr1, expr2, expr3));
     case E_LAMBDA:
-        if(this->stxs.size() != 3) throw(RuntimeError(""));
-        List *p = dynamic_cast<List*>(this->stxs[1].get());
-        if(!p) throw(RuntimeError(""));
-        for(int i = 0; i < p->stxs.size(); ++i)
+        if (this->stxs.size() != 3)
+            throw(RuntimeError(""));
+        p = dynamic_cast<List *>(this->stxs[1].get());
+        if (!p)
+            throw(RuntimeError(""));
+        for (int i = 0; i < p->stxs.size(); ++i)
         {
-            Identifier *id = dynamic_cast<Identifier*>(p->stxs[i].get());
-            if(!id) throw(RuntimeError(""));
+            Identifier *id = dynamic_cast<Identifier *>(p->stxs[i].get());
+            if (!id)
+                throw(RuntimeError(""));
             para.push_back(id->s);
         }
         body = this->stxs[2].parse(env);
         return Expr(new Lambda(para, body));
     // case E_LET:
-    //     if(this->stxs.size() != 3) throw(RuntimeError(""));    
-    //     break;    
+    //     if (this->stxs.size() != 3)
+    //         throw(RuntimeError(""));
+    //     Expr bd = this->stxs[2].parse(env);
+    //     List *lsts = dynamic_cast<List *>(this->stxs[1].get());
+    //     if (!lsts)
+    //         throw(RuntimeError(""));
+    //     for (int i = 0; i < lsts->stxs.size(); ++i)
+    //     {
+    //         List *ls = dynamic_cast<List *>(lsts->stxs[i].get());
+    //         if (!ls || ls->stxs.size() != 2)
+    //             throw(RuntimeError(""));
+    //         Identifier *varId = dynamic_cast<Identifier *>(ls->stxs[0].get());
+    //         if (!varId) throw(RuntimeError(""));
+    //         Expr e = ls->stxs[1].parse(env);
+    //         bind.push_back({varId->s, e});
+    //     }
+    //     return Expr(new Let(bind, bd));
+    default:
+        break;
     }
     // switch (primitives[identifierPtr->s])
     // {
@@ -126,14 +158,14 @@ Expr List ::parse(Assoc &env)
     //     throw(RuntimeError(""));
     // case E_CAR:
     //     if(this->stxs.size() != 2) throw(RuntimeError(""));
-    //     else 
+    //     else
     //     {
     //         Expr expr = this->stxs[1]->parse(env);
     //         return Expr(new Car(expr));
     //     }
     // case E_CDR:
     //     if(this->stxs.size() != 2) throw(RuntimeError(""));
-    //     else 
+    //     else
     //     {
     //         Expr expr = this->stxs[1]->parse(env);
     //         return Expr(new Cdr(expr));
@@ -165,16 +197,17 @@ Expr List ::parse(Assoc &env)
     //     return Expr(new IsProcedure(ep));
     //}
     Expr vr = this->stxs[0].parse(env);
-    Var *v = dynamic_cast<Var*>(vr.get());
-    if(!v) throw(RuntimeError(""));
+    Var *v = dynamic_cast<Var *>(vr.get());
+    if (!v)
+        throw(RuntimeError(""));
     std::vector<Expr> es;
-    for(int i = 1; i < this->stxs.size(); ++i)
+    for (int i = 1; i < this->stxs.size(); ++i)
     {
         Expr e = this->stxs[i].parse(env);
         es.push_back(e);
     }
-    if(primitives.find(v->x) != primitives.end())
-    return Expr(new Apply(vr, es));
+    if (primitives.find(v->x) != primitives.end())
+        return Expr(new Apply(vr, es));
     // switch (primitives[v->x])
     // {
     // case E_PLUS:
@@ -191,12 +224,12 @@ Expr List ::parse(Assoc &env)
     //     return Expr(new Less(expr1, expr2));
     // case E_LE:
     //     return Expr(new LessEq(expr1, expr2));
-    // case E_EQ:    
+    // case E_EQ:
     //     return Expr(new Equal(expr1, expr2));
-    // case E_GE:    
+    // case E_GE:
     //     return Expr(new GreaterEq(expr1, expr2));
-    // case E_GT:  
-    //     return Expr(new Greater(expr1, expr2)); 
+    // case E_GT:
+    //     return Expr(new Greater(expr1, expr2));
     // case E_CONS:
     //     return Expr(new Cons(expr1, expr2));
     // }
