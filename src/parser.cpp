@@ -115,8 +115,8 @@ Expr List ::parse(Assoc &env)
     //     if(this->stxs.size() != 3) throw(RuntimeError(""));    
     //     break;    
     }
-    switch (primitives[identifierPtr->s])
-    {
+    // switch (primitives[identifierPtr->s])
+    // {
     // case E_VOID:
     //     if(this->stxs.size() != 1) throw(RuntimeError(""));
     //     return new MakeVoid();
@@ -124,46 +124,46 @@ Expr List ::parse(Assoc &env)
     //     if (this->stxs.size() == 1)
     //         return Expr(new Exit());
     //     throw(RuntimeError(""));
-    case E_CAR:
-        if(this->stxs.size() != 2) throw(RuntimeError(""));
-        else 
-        {
-            Expr expr = this->stxs[1]->parse(env);
-            return Expr(new Car(expr));
-        }
-    case E_CDR:
-        if(this->stxs.size() != 2) throw(RuntimeError(""));
-        else 
-        {
-            Expr expr = this->stxs[1]->parse(env);
-            return Expr(new Cdr(expr));
-        }
-    case E_INTQ:
-        if(this->stxs.size() != 2) throw(RuntimeError(""));
-        return Expr(new IsFixnum(this->stxs[1].parse(env)));
-    case E_SYMBOLQ:
-        if(this->stxs.size() != 2) throw(RuntimeError(""));
-        return Expr(new IsSymbol(this->stxs[1].parse(env)));
-    case E_BOOLQ:
-        if(this->stxs.size() != 2) throw(RuntimeError(""));
-        return Expr(new IsBoolean(this->stxs[1].parse(env)));
-    case E_NULLQ:
-        if(this->stxs.size() != 2) throw(RuntimeError(""));
-        return Expr(new IsNull(this->stxs[1].parse(env)));
-    case E_PAIRQ:
-        if(this->stxs.size() != 2) throw(RuntimeError(""));
-        return Expr(new IsPair(this->stxs[1].parse(env)));
-    case E_NOT:
-        if(this->stxs.size() != 2) throw(RuntimeError(""));
-        return Expr(new Not(this->stxs[1].parse(env)));
-    case E_EQQ:
-        if(this->stxs.size() != 3) throw(RuntimeError(""));
-        return Expr(new IsEq(this->stxs[1].parse(env), this->stxs[2].parse(env)));
-    case E_PROCQ:
-        if(this->stxs.size() != 2) throw(RuntimeError(""));
-        Expr ep = this->stxs[1].parse(env);
-        return Expr(new IsProcedure(ep));
-    }
+    // case E_CAR:
+    //     if(this->stxs.size() != 2) throw(RuntimeError(""));
+    //     else 
+    //     {
+    //         Expr expr = this->stxs[1]->parse(env);
+    //         return Expr(new Car(expr));
+    //     }
+    // case E_CDR:
+    //     if(this->stxs.size() != 2) throw(RuntimeError(""));
+    //     else 
+    //     {
+    //         Expr expr = this->stxs[1]->parse(env);
+    //         return Expr(new Cdr(expr));
+    //     }
+    // case E_INTQ:
+    //     if(this->stxs.size() != 2) throw(RuntimeError(""));
+    //     return Expr(new IsFixnum(this->stxs[1].parse(env)));
+    // case E_SYMBOLQ:
+    //     if(this->stxs.size() != 2) throw(RuntimeError(""));
+    //     return Expr(new IsSymbol(this->stxs[1].parse(env)));
+    // case E_BOOLQ:
+    //     if(this->stxs.size() != 2) throw(RuntimeError(""));
+    //     return Expr(new IsBoolean(this->stxs[1].parse(env)));
+    // case E_NULLQ:
+    //     if(this->stxs.size() != 2) throw(RuntimeError(""));
+    //     return Expr(new IsNull(this->stxs[1].parse(env)));
+    // case E_PAIRQ:
+    //     if(this->stxs.size() != 2) throw(RuntimeError(""));
+    //     return Expr(new IsPair(this->stxs[1].parse(env)));
+    // case E_NOT:
+    //     if(this->stxs.size() != 2) throw(RuntimeError(""));
+    //     return Expr(new Not(this->stxs[1].parse(env)));
+    // case E_EQQ:
+    //     if(this->stxs.size() != 3) throw(RuntimeError(""));
+    //     return Expr(new IsEq(this->stxs[1].parse(env), this->stxs[2].parse(env)));
+    // case E_PROCQ:
+    //     if(this->stxs.size() != 2) throw(RuntimeError(""));
+    //     Expr ep = this->stxs[1].parse(env);
+    //     return Expr(new IsProcedure(ep));
+    //}
     Expr vr = this->stxs[0].parse(env);
     Var *v = dynamic_cast<Var*>(vr.get());
     if(!v) throw(RuntimeError(""));

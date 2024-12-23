@@ -93,6 +93,45 @@ Value Var::eval(Assoc &e)
         Params.clear();
         Body = Expr(new Exit());
         return ClosureV(Params, Body, e);
+    case E_EQQ:
+        Body = Expr(new IsEq(Expr(new Var("x")), Expr(new Var("y"))));
+        return ClosureV(Params, Body, e);
+    case E_PROCQ:
+        Params.pop_back();
+        Body = Expr(new IsProcedure(new Var("x")));
+        return ClosureV(Params, Body, e);
+    case E_NOT:
+        Params.pop_back();
+        Body = Expr(new Not(new Var("x")));
+        return ClosureV(Params, Body, e);    
+    case E_PAIRQ:
+        Params.pop_back();
+        Body = Expr(new IsPair(new Var("x")));
+        return ClosureV(Params, Body, e);  
+    case E_NULLQ:
+        Params.pop_back();
+        Body = Expr(new IsNull(new Var("x")));
+        return ClosureV(Params, Body, e); 
+    case E_BOOLQ:
+        Params.pop_back();
+        Body = Expr(new IsBoolean(new Var("x")));
+        return ClosureV(Params, Body, e);         
+    case E_SYMBOLQ:
+        Params.pop_back();
+        Body = Expr(new IsSymbol(new Var("x")));
+        return ClosureV(Params, Body, e);  
+    case E_INTQ:
+        Params.pop_back();
+        Body = Expr(new IsFixnum(new Var("x")));
+        return ClosureV(Params, Body, e);  
+    case E_CAR:
+        Params.pop_back();
+        Body = Expr(new Car(new Var("x")));
+        return ClosureV(Params, Body, e);  
+    case E_CDR:
+        Params.pop_back();
+        Body = Expr(new Cdr(new Var("x")));
+        return ClosureV(Params, Body, e);      
     }
     throw(RuntimeError(""));
 } // evaluation of variable
