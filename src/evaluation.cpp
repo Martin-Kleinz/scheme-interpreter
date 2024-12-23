@@ -174,7 +174,7 @@ Value Begin::eval(Assoc &e)
     for(int i = 0; i < this->es.size() - 1; ++i)
         this->es[i]->eval(e);
     return this->es.back()->eval(e);
-} // begin expression
+} // begin expression    (begin (+ #t 1) 1)
 
 Value Quote::eval(Assoc &e)
 {

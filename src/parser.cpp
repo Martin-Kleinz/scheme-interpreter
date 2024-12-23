@@ -87,8 +87,8 @@ Expr List ::parse(Assoc &env)
     std::vector<std::pair<std::string, Expr>> bind;
     std::vector<Expr> bg;
     std::vector<std::string> para;
-    Expr body = nullptr, expr1 = nullptr, expr2 = nullptr, expr3 = nullptr;
-    List *p = nullptr;
+    Expr body = nullptr, bd = nullptr, expr1 = nullptr, expr2 = nullptr, expr3 = nullptr;
+    List *p = nullptr, *lsts = nullptr;
     switch (reserved_words[identifierPtr->s])
     {
     case E_QUOTE:
@@ -126,26 +126,27 @@ Expr List ::parse(Assoc &env)
         }
         body = this->stxs[2].parse(env);
         return Expr(new Lambda(para, body));
-    // case E_LET:
-    //     if (this->stxs.size() != 3)
-    //         throw(RuntimeError(""));
-    //     Expr bd = this->stxs[2].parse(env);
-    //     List *lsts = dynamic_cast<List *>(this->stxs[1].get());
-    //     if (!lsts)
-    //         throw(RuntimeError(""));
-    //     for (int i = 0; i < lsts->stxs.size(); ++i)
-    //     {
-    //         List *ls = dynamic_cast<List *>(lsts->stxs[i].get());
-    //         if (!ls || ls->stxs.size() != 2)
-    //             throw(RuntimeError(""));
-    //         Identifier *varId = dynamic_cast<Identifier *>(ls->stxs[0].get());
-    //         if (!varId) throw(RuntimeError(""));
-    //         Expr e = ls->stxs[1].parse(env);
-    //         bind.push_back({varId->s, e});
-    //     }
-    //     return Expr(new Let(bind, bd));
     default:
         break;
+    }
+    if(identifierPtr->s == "let")
+    {
+        if (this->stxs.size() != 3)
+            throw(RuntimeError(""));
+        bd = this->stxs[2].parse(env);
+        lsts = dynamic_cast<List *>(this->stxs[1].get());
+        if (!lsts) throw(RuntimeError(""));
+        for (int i = 0; i < lsts->stxs.size(); ++i)
+        {
+            List *ls = dynamic_cast<List *>(lsts->stxs[i].get());
+            if (!ls || ls->stxs.size() != 2)
+                throw(RuntimeError(""));
+            Identifier *varId = dynamic_cast<Identifier *>(ls->stxs[0].get());
+            if (!varId) throw(RuntimeError(""));
+            Expr ex = ls->stxs[1].parse(env);
+            bind.push_back({varId->s, ex});
+        }
+        return Expr(new Let(bind, bd));
     }
     // switch (primitives[identifierPtr->s])
     // {
