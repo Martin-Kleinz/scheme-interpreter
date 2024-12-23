@@ -64,16 +64,16 @@ Expr List ::parse(Assoc &env)
     Identifier *identifierPtr = dynamic_cast<Identifier *>(this->stxs[0].get());
     if (!identifierPtr)
     {
+        List *lst = dynamic_cast<List*>(this->stxs[0].get());
+        if(!lst) throw(RuntimeError(""));
         Expr l = this->stxs[0].parse(env);
-        Lambda *lbd = dynamic_cast<Lambda*>(l.get());
-        if(!lbd || lbd->x.size() != this->stxs.size() - 1) throw(RuntimeError(""));
-        std::vector<Expr> rd;
+        std::vector<Expr> eps;
         for(int i = 1; i < this->stxs.size(); ++i)
         {
-            Expr ex = this->stxs[i].parse(env);
-            rd.push_back(ex);
+            Expr ep = this->stxs[i].parse(env);
+            eps.push_back(ep);
         }
-        return Expr(new Apply(l, rd));
+        return Expr(new Apply(l, eps));
     }
     std::vector<Expr> bg; 
     std::vector<std::string> para;  
