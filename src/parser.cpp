@@ -95,22 +95,22 @@ Expr List ::parse(Assoc &env)
         if (this->stxs.size() != 2)
             throw(RuntimeError(""));
         return Expr(new Quote(this->stxs[1]));
-    case E_BEGIN:
-        if (this->stxs.size() < 2)
-            throw(RuntimeError(""));
-        for (int i = 1; i < this->stxs.size(); ++i)
-        {
-            Expr expr = this->stxs[i].parse(env);
-            bg.push_back(expr);
-        }
-        return Expr(new Begin(bg));
-    case E_IF:
-        if (this->stxs.size() != 4)
-            throw(RuntimeError(""));
-        expr1 = this->stxs[1].parse(env);
-        expr2 = this->stxs[2].parse(env);
-        expr3 = this->stxs[3].parse(env);
-        return Expr(new If(expr1, expr2, expr3));
+    // case E_BEGIN:
+    //     if (this->stxs.size() < 2)
+    //         throw(RuntimeError(""));
+    //     for (int i = 1; i < this->stxs.size(); ++i)
+    //     {
+    //         Expr expr = this->stxs[i].parse(env);
+    //         bg.push_back(expr);
+    //     }
+    //     return Expr(new Begin(bg));
+    // case E_IF:
+    //     if (this->stxs.size() != 4)
+    //         throw(RuntimeError(""));
+    //     expr1 = this->stxs[1].parse(env);
+    //     expr2 = this->stxs[2].parse(env);
+    //     expr3 = this->stxs[3].parse(env);
+    //     return Expr(new If(expr1, expr2, expr3));
     default:
         break;
     }
@@ -124,8 +124,9 @@ Expr List ::parse(Assoc &env)
             throw(RuntimeError(""));
         for (int i = 0; i < p->stxs.size(); ++i)
         {
-            Identifier *v = dynamic_cast<Identifier*>(p->stxs[i].get());
-            std::string s = v->s;
+            Expr v = p->stxs[i].parse(env);
+            Var *var = dynamic_cast<Var*>(v.get());
+            std::string s = var->x;
             para.push_back(s);
             now = Assoc(new AssocList(s, NullV(), now));
         }

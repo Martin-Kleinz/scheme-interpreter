@@ -140,6 +140,26 @@ Value Var::eval(Assoc &e)
         Body = Expr(new Cdr(new Var("x")));
         return ClosureV(Params, Body, e);        
     }
+    if (this->x == "if")
+    {
+        std::vector<std::string> Params = {"cond", "then", "else"};
+        Expr Body = Expr(new If(Expr(new Var("cond")), Expr(new Var("then")), Expr(new Var("else"))));
+        return ClosureV(Params, Body, e);
+    }
+    // if (this->x == "quote")
+    // {
+    //     std::vector<std::string> Params = {"x"};
+    //     Expr Body = Expr(new Quote(Expr()));
+    //     return ClosureV(Params, Body, e);
+    // }
+    if (this->x == "begin")
+    {
+        std::vector<std::string> Params = {"exprs"};
+        std::vector<Expr> expr_list;
+        expr_list.push_back(Expr(new Var("exprs")));
+        Expr Body = Expr(new Begin(expr_list));
+        return ClosureV(Params, Body, e);
+    }
     throw(RuntimeError(""));
 } // evaluation of variable
 
