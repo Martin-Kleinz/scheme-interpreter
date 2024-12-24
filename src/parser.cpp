@@ -70,7 +70,6 @@ Expr List ::parse(Assoc &env)
 {
     // if (this->stxs.empty())
     //     throw(RuntimeError(""));
-    Assoc current = env;
     Identifier *identifierPtr = dynamic_cast<Identifier *>(this->stxs[0].get());
     if (!identifierPtr)
     {
@@ -125,15 +124,17 @@ Expr List ::parse(Assoc &env)
         for (int i = 0; i < p->stxs.size(); ++i)
         {
             Identifier *v = dynamic_cast<Identifier*>(p->stxs[i].get());
-            Assoc now(new AssocList(v->s, NullV(), current));
-            current = now;
-            para.push_back(v->s);
+            std::string s = v->s;
+            Assoc now(new AssocList(s, NullV(), env));
+            env = now;
+            para.push_back(s);
         }
-        Expr body = this->stxs[2].parse(current);
+        Expr body = this->stxs[2].parse(env);
         return Expr(new Lambda(para, body));
     }
     if(identifierPtr->s == "let")
     {
+        Assoc bef = env;
         if (this->stxs.size() != 3)
             throw(RuntimeError(""));
         List *lsts = dynamic_cast<List *>(this->stxs[1].get());
@@ -145,12 +146,12 @@ Expr List ::parse(Assoc &env)
                 throw(RuntimeError(""));
             Identifier *varId = dynamic_cast<Identifier *>(ls->stxs[0].get());
             if (!varId) throw(RuntimeError(""));
-            Assoc now(new AssocList(varId->s, NullV(), current));
-            current = now;
-            Expr ex = ls->stxs[1].parse(env);
+            Assoc now(new AssocList(varId->s, NullV(), env));
+            env = now;
+            Expr ex = ls->stxs[1].parse(bef);
             bind.push_back({varId->s, ex});
         }
-        Expr bd = this->stxs[2].parse(current);
+        Expr bd = this->stxs[2].parse(env);
         return Expr(new Let(bind, bd));
     }
     // switch (primitives[identifierPtr->s])
@@ -203,9 +204,6 @@ Expr List ::parse(Assoc &env)
     //     return Expr(new IsProcedure(ep));
     //}
     Expr vr = this->stxs[0].parse(env);
-    Var *v = dynamic_cast<Var *>(vr.get());
-    if (!v)
-        throw(RuntimeError(""));
     std::vector<Expr> es;
     for (int i = 1; i < this->stxs.size(); ++i)
     {

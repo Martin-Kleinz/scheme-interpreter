@@ -12,21 +12,20 @@ extern std ::map<std ::string, ExprType> reserved_words;
 
 Value Let::eval(Assoc &env)
 {
-    Assoc current = env;
     for(int i = 0; i < this->bind.size(); ++i)
     {
+        Assoc current = env;
         Expr ep = this->bind[i].second;
         Value v = ep->eval(env);
-        Assoc now(new AssocList(this->bind[i].first, v, current));
-        current = now;
+        while(current.get()->x != this->bind[i].first) current = current.get()->next;
+        current.get()->v = v;
     }
-    return this->body->eval(current);
+    return this->body->eval(env);
 } // let expression
 
 Value Lambda::eval(Assoc &env)
 {
-    Assoc now = env;
-    return ClosureV(this->x, this->e, now);
+    return ClosureV(this->x, this->e, env);
 } // lambda expression
 
 Value Apply::eval(Assoc &e)
@@ -37,14 +36,14 @@ Value Apply::eval(Assoc &e)
     Closure *clo = dynamic_cast<Closure *>(v.get());
     if (!clo || clo->parameters.size() != this->rand.size())
         throw(RuntimeError(""));
-    Assoc current = e;
     for (int i = 0; i < this->rand.size(); ++i)
     {
+        Assoc current = e;
         Value v = this->rand[i]->eval(e);
-        Assoc now(new AssocList(clo->parameters[i], v, current));
-        current = now;
+        while(current.get()->x != clo->parameters[i]) current = current.get()->next;
+        current.get()->v = v;
     }
-    return clo->e->eval(current);
+    return clo->e->eval(e);
 } // for function calling
 
 Value Letrec::eval(Assoc &env)
