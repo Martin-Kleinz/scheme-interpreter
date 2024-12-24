@@ -19,12 +19,13 @@ Value Let::eval(Assoc &env)
         Value v = ep->eval(env);
         now = Assoc(new AssocList(this->bind[i].first, v, now));
     }
-    return this->body->eval(env);
+    return this->body->eval(now);
 } // let expression
 
 Value Lambda::eval(Assoc &env)
 {
-    return ClosureV(this->x, this->e, env);
+    Assoc now = env;
+    return ClosureV(this->x, this->e, now);
 } // lambda expression
 
 Value Apply::eval(Assoc &e)
