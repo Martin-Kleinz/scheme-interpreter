@@ -12,13 +12,12 @@ extern std ::map<std ::string, ExprType> reserved_words;
 
 Value Let::eval(Assoc &env)
 {
+    Assoc now = env;
     for(int i = 0; i < this->bind.size(); ++i)
     {
-        Assoc current = env;
         Expr ep = this->bind[i].second;
         Value v = ep->eval(env);
-        while(current.get()->x != this->bind[i].first) current = current.get()->next;
-        current.get()->v = v;
+        now = Assoc(new AssocList(this->bind[i].first, v, now));
     }
     return this->body->eval(env);
 } // let expression
@@ -36,14 +35,13 @@ Value Apply::eval(Assoc &e)
     Closure *clo = dynamic_cast<Closure *>(v.get());
     if (!clo || clo->parameters.size() != this->rand.size())
         throw(RuntimeError(""));
+    Assoc current = clo->env;    
     for (int i = 0; i < this->rand.size(); ++i)
     {
-        Assoc current = e;
         Value v = this->rand[i]->eval(e);
-        while(current.get()->x != clo->parameters[i]) current = current.get()->next;
-        current.get()->v = v;
+        current = Assoc(new AssocList(clo->parameters[i], v, current));
     }
-    return clo->e->eval(e);
+    return clo->e->eval(current);
 } // for function calling
 
 Value Letrec::eval(Assoc &env)
