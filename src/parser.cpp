@@ -89,12 +89,10 @@ Expr List ::parse(Assoc &env)
     std::vector<Expr> bg;
     std::vector<std::string> para;
     Expr expr1 = nullptr, expr2 = nullptr, expr3 = nullptr;
-    switch (reserved_words[identifierPtr->s])
-    {
-    case E_QUOTE:
-        if (this->stxs.size() != 2)
-            throw(RuntimeError(""));
-        return Expr(new Quote(this->stxs[1]));
+    // switch (reserved_words[identifierPtr->s])
+    // {
+    // case E_QUOTE:
+    //     
     // case E_BEGIN:
     //     if (this->stxs.size() < 2)
     //         throw(RuntimeError(""));
@@ -111,8 +109,23 @@ Expr List ::parse(Assoc &env)
     //     expr2 = this->stxs[2].parse(env);
     //     expr3 = this->stxs[3].parse(env);
     //     return Expr(new If(expr1, expr2, expr3));
-    default:
-        break;
+    // default:
+    //     break;
+    // }
+    if(identifierPtr->s == "quote")
+    {
+        // if (this->stxs.size() != 2)
+        //     throw(RuntimeError(""));
+        // return Expr(new Quote(this->stxs[1]));
+        Assoc now = env;
+        while(now.get() && now.get()->x != "quote") now = now.get()->next;
+        if(!now.get())
+        {
+            if(this->stxs.size() != 2) throw(RuntimeError(""));
+            Expr var = this->stxs[0].parse(env);
+            std::vector<Expr> body = {Expr(new Quote(this->stxs[1]))};
+            return Expr(new Apply(var, body));
+        }
     }
     if(identifierPtr->s == "lambda")
     {
