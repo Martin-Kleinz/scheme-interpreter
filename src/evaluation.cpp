@@ -12,14 +12,14 @@ extern std ::map<std ::string, ExprType> reserved_words;
 
 Value Let::eval(Assoc &env)
 {
-    Assoc now = env;
-    for(int i = 0; i < this->bind.size(); ++i)
+    Assoc env1 = env;
+    for (int i = 0; i < this->bind.size(); ++i)
     {
         Expr ep = this->bind[i].second;
         Value v = ep->eval(env);
-        now = Assoc(new AssocList(this->bind[i].first, v, now));
+        env1 = Assoc(new AssocList(this->bind[i].first, v, env1));
     }
-    return this->body->eval(now);
+    return this->body->eval(env1);
 } // let expression
 
 Value Lambda::eval(Assoc &env)
@@ -36,7 +36,7 @@ Value Apply::eval(Assoc &e)
     Closure *clo = dynamic_cast<Closure *>(v.get());
     if (!clo || clo->parameters.size() != this->rand.size())
         throw(RuntimeError(""));
-    Assoc current = clo->env;    
+    Assoc current = clo->env;
     for (int i = 0; i < this->rand.size(); ++i)
     {
         Value v = this->rand[i]->eval(e);
@@ -47,7 +47,18 @@ Value Apply::eval(Assoc &e)
 
 Value Letrec::eval(Assoc &env)
 {
-
+    Assoc env1 = env;
+    for (int i = 0; i < this->bind.size(); ++i)
+    {
+        env1 = Assoc(new AssocList(this->bind[i].first, NullV(), env1));
+    }
+    Assoc env2 = env1;
+    for (int i = 0; i < this->bind.size(); ++i)
+    {
+        Value v = this->bind[i].second->eval(env1);
+        env2 = Assoc(new AssocList(this->bind[i].first, v, env2));
+    }
+    return this->body->eval(env2);
 } // letrec expression
 
 Value Var::eval(Assoc &e)
@@ -110,35 +121,35 @@ Value Var::eval(Assoc &e)
     case E_NOT:
         Params.pop_back();
         Body = Expr(new Not(new Var("x")));
-        return ClosureV(Params, Body, e);    
+        return ClosureV(Params, Body, e);
     case E_PAIRQ:
         Params.pop_back();
         Body = Expr(new IsPair(new Var("x")));
-        return ClosureV(Params, Body, e);  
+        return ClosureV(Params, Body, e);
     case E_NULLQ:
         Params.pop_back();
         Body = Expr(new IsNull(new Var("x")));
-        return ClosureV(Params, Body, e); 
+        return ClosureV(Params, Body, e);
     case E_BOOLQ:
         Params.pop_back();
         Body = Expr(new IsBoolean(new Var("x")));
-        return ClosureV(Params, Body, e);         
+        return ClosureV(Params, Body, e);
     case E_SYMBOLQ:
         Params.pop_back();
         Body = Expr(new IsSymbol(new Var("x")));
-        return ClosureV(Params, Body, e);  
+        return ClosureV(Params, Body, e);
     case E_INTQ:
         Params.pop_back();
         Body = Expr(new IsFixnum(new Var("x")));
-        return ClosureV(Params, Body, e);  
+        return ClosureV(Params, Body, e);
     case E_CAR:
         Params.pop_back();
         Body = Expr(new Car(new Var("x")));
-        return ClosureV(Params, Body, e);  
+        return ClosureV(Params, Body, e);
     case E_CDR:
         Params.pop_back();
         Body = Expr(new Cdr(new Var("x")));
-        return ClosureV(Params, Body, e);        
+        return ClosureV(Params, Body, e);
     }
     throw(RuntimeError(""));
 } // evaluation of variable
@@ -170,7 +181,7 @@ Value False::eval(Assoc &e)
 
 Value Begin::eval(Assoc &e)
 {
-    for(int i = 0; i < this->es.size() - 1; ++i)
+    for (int i = 0; i < this->es.size() - 1; ++i)
         this->es[i]->eval(e);
     return this->es.back()->eval(e);
 } // begin expression    (begin (+ #t 1) 1)
@@ -255,8 +266,9 @@ Value Plus::evalRator(const Value &rand1, const Value &rand2)
 {
     Integer *Ptr1 = dynamic_cast<Integer *>(rand1.get());
     Integer *Ptr2 = dynamic_cast<Integer *>(rand2.get());
-    if (!Ptr1 || !Ptr2) throw(RuntimeError(""));
-    return IntegerV(Ptr1->n + Ptr2->n);      
+    if (!Ptr1 || !Ptr2)
+        throw(RuntimeError(""));
+    return IntegerV(Ptr1->n + Ptr2->n);
 } // +
 
 Value Minus::evalRator(const Value &rand1, const Value &rand2)

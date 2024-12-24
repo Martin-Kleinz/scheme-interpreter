@@ -150,44 +150,81 @@ Expr List ::parse(Assoc &env)
     if (identifierPtr->s == "lambda")
     {
         Assoc now = env;
-        if (this->stxs.size() != 3)
-            throw(RuntimeError(""));
-        List *p = dynamic_cast<List *>(this->stxs[1].get());
-        if (!p)
-            throw(RuntimeError(""));
-        for (int i = 0; i < p->stxs.size(); ++i)
+        while (now.get() && now.get()->x != "lambda")
+            now = now.get()->next;
+        if (!now.get())
         {
-            Expr v = p->stxs[i].parse(env);
-            Var *var = dynamic_cast<Var *>(v.get());
-            std::string s = var->x;
-            para.push_back(s);
-            now = Assoc(new AssocList(s, NullV(), now));
+            now = env;
+            if (this->stxs.size() != 3)
+                throw(RuntimeError(""));
+            List *p = dynamic_cast<List *>(this->stxs[1].get());
+            if (!p)
+                throw(RuntimeError(""));
+            for (int i = 0; i < p->stxs.size(); ++i)
+            {
+                Expr v = p->stxs[i].parse(env);
+                Var *var = dynamic_cast<Var *>(v.get());
+                std::string s = var->x;
+                para.push_back(s);
+                now = Assoc(new AssocList(s, NullV(), now));
+            }
+            Expr body = this->stxs[2].parse(now);
+            return Expr(new Lambda(para, body));
         }
-        Expr body = this->stxs[2].parse(now);
-        return Expr(new Lambda(para, body));
     }
     if (identifierPtr->s == "let")
     {
         Assoc now = env;
-        if (this->stxs.size() != 3)
-            throw(RuntimeError(""));
-        List *lsts = dynamic_cast<List *>(this->stxs[1].get());
-        if (!lsts)
-            throw(RuntimeError(""));
-        for (int i = 0; i < lsts->stxs.size(); ++i)
+        while (now.get() && now.get()->x != "let")
+            now = now.get()->next;
+        if (!now.get())
         {
-            List *ls = dynamic_cast<List *>(lsts->stxs[i].get());
-            if (!ls || ls->stxs.size() != 2)
+            if (this->stxs.size() != 3)
                 throw(RuntimeError(""));
-            Identifier *varId = dynamic_cast<Identifier *>(ls->stxs[0].get());
-            if (!varId)
+            List *lsts = dynamic_cast<List *>(this->stxs[1].get());
+            if (!lsts)
                 throw(RuntimeError(""));
-            Expr ex = ls->stxs[1].parse(env);
-            bind.push_back({varId->s, ex});
-            now = Assoc(new AssocList(varId->s, NullV(), now));
+            for (int i = 0; i < lsts->stxs.size(); ++i)
+            {
+                List *ls = dynamic_cast<List *>(lsts->stxs[i].get());
+                if (!ls || ls->stxs.size() != 2)
+                    throw(RuntimeError(""));
+                Identifier *varId = dynamic_cast<Identifier *>(ls->stxs[0].get());
+                if (!varId)
+                    throw(RuntimeError(""));
+                Expr ex = ls->stxs[1].parse(env);
+                bind.push_back({varId->s, ex});
+            }
+            Expr bd = this->stxs[2].parse(env);
+            return Expr(new Let(bind, bd));
         }
-        Expr bd = this->stxs[2].parse(now);
-        return Expr(new Let(bind, bd));
+    }
+    if (identifierPtr->s == "letrec")
+    {
+        Assoc now = env;
+        while (now.get() && now.get()->x != "letrec")
+            now = now.get()->next;
+        if (!now.get())
+        {
+            if (this->stxs.size() != 3)
+                throw(RuntimeError(""));
+            List *lsts = dynamic_cast<List *>(this->stxs[1].get());
+            if (!lsts)
+                throw(RuntimeError(""));
+            for (int i = 0; i < lsts->stxs.size(); ++i)
+            {
+                List *ls = dynamic_cast<List *>(lsts->stxs[i].get());
+                if (!ls || ls->stxs.size() != 2)
+                    throw(RuntimeError(""));
+                Identifier *varId = dynamic_cast<Identifier *>(ls->stxs[0].get());
+                if (!varId)
+                    throw(RuntimeError(""));
+                Expr ex = ls->stxs[1].parse(env);
+                bind.push_back({varId->s, ex});
+            }
+            Expr bd = this->stxs[2].parse(env);
+            return Expr(new Let(bind, bd));
+        }
     }
     // switch (primitives[identifierPtr->s])
     // {
@@ -272,7 +309,7 @@ Expr List ::parse(Assoc &env)
     // case E_CONS:
     //     return Expr(new Cons(expr1, expr2));
     // }
-    throw(RuntimeError(""));
+    // throw(RuntimeError(""));
 }
 
 #endif
