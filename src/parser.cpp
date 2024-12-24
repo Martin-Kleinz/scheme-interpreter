@@ -92,16 +92,9 @@ Expr List ::parse(Assoc &env)
     // switch (reserved_words[identifierPtr->s])
     // {
     // case E_QUOTE:
-    //     
+    //
     // case E_BEGIN:
-    //     if (this->stxs.size() < 2)
-    //         throw(RuntimeError(""));
-    //     for (int i = 1; i < this->stxs.size(); ++i)
-    //     {
-    //         Expr expr = this->stxs[i].parse(env);
-    //         bg.push_back(expr);
-    //     }
-    //     return Expr(new Begin(bg));
+    //
     // case E_IF:
     //     if (this->stxs.size() != 4)
     //         throw(RuntimeError(""));
@@ -112,20 +105,39 @@ Expr List ::parse(Assoc &env)
     // default:
     //     break;
     // }
-    if(identifierPtr->s == "quote")
+    if (identifierPtr->s == "quote")
     {
         // if (this->stxs.size() != 2)
         //     throw(RuntimeError(""));
         // return Expr(new Quote(this->stxs[1]));
         Assoc now = env;
-        while(now.get() && now.get()->x != "quote") now = now.get()->next;
-        if(!now.get())
+        while (now.get() && now.get()->x != "quote")
+            now = now.get()->next;
+        if (!now.get())
         {
-            if(this->stxs.size() != 2) throw(RuntimeError(""));
+            if (this->stxs.size() != 2)
+                throw(RuntimeError(""));
             return Expr(new Quote(this->stxs[1]));
         }
     }
-    if(identifierPtr->s == "lambda")
+    if (identifierPtr->s == "begin")
+    {
+        Assoc now = env;
+        while (now.get() && now.get()->x != "begin")
+            now = now.get()->next;
+        if (!now.get())
+        {
+            if (this->stxs.size() < 2)
+                throw(RuntimeError(""));
+            for (int i = 1; i < this->stxs.size(); ++i)
+            {
+                Expr expr = this->stxs[i].parse(env);
+                bg.push_back(expr);
+            }
+            return Expr(new Begin(bg));
+        }
+    }
+    if (identifierPtr->s == "lambda")
     {
         Assoc now = env;
         if (this->stxs.size() != 3)
@@ -136,7 +148,7 @@ Expr List ::parse(Assoc &env)
         for (int i = 0; i < p->stxs.size(); ++i)
         {
             Expr v = p->stxs[i].parse(env);
-            Var *var = dynamic_cast<Var*>(v.get());
+            Var *var = dynamic_cast<Var *>(v.get());
             std::string s = var->x;
             para.push_back(s);
             now = Assoc(new AssocList(s, NullV(), now));
@@ -144,20 +156,22 @@ Expr List ::parse(Assoc &env)
         Expr body = this->stxs[2].parse(now);
         return Expr(new Lambda(para, body));
     }
-    if(identifierPtr->s == "let")
+    if (identifierPtr->s == "let")
     {
         Assoc now = env;
         if (this->stxs.size() != 3)
             throw(RuntimeError(""));
         List *lsts = dynamic_cast<List *>(this->stxs[1].get());
-        if (!lsts) throw(RuntimeError(""));
+        if (!lsts)
+            throw(RuntimeError(""));
         for (int i = 0; i < lsts->stxs.size(); ++i)
         {
             List *ls = dynamic_cast<List *>(lsts->stxs[i].get());
             if (!ls || ls->stxs.size() != 2)
                 throw(RuntimeError(""));
             Identifier *varId = dynamic_cast<Identifier *>(ls->stxs[0].get());
-            if (!varId) throw(RuntimeError(""));
+            if (!varId)
+                throw(RuntimeError(""));
             Expr ex = ls->stxs[1].parse(env);
             bind.push_back({varId->s, ex});
             now = Assoc(new AssocList(varId->s, NullV(), now));
@@ -221,8 +235,8 @@ Expr List ::parse(Assoc &env)
         Expr e = this->stxs[i].parse(env);
         es.push_back(e);
     }
-  //  if (primitives.find(v->x) != primitives.end() || this->stxs.size() == 2)
-        return Expr(new Apply(vr, es));
+    //  if (primitives.find(v->x) != primitives.end() || this->stxs.size() == 2)
+    return Expr(new Apply(vr, es));
     // switch (primitives[v->x])
     // {
     // case E_PLUS:
