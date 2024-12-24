@@ -122,9 +122,7 @@ Expr List ::parse(Assoc &env)
         if(!now.get())
         {
             if(this->stxs.size() != 2) throw(RuntimeError(""));
-            Expr var = this->stxs[0].parse(env);
-            std::vector<Expr> body = {Expr(new Quote(this->stxs[1]))};
-            return Expr(new Apply(var, body));
+            return Expr(new Quote(this->stxs[1]));
         }
     }
     if(identifierPtr->s == "lambda")
