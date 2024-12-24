@@ -96,15 +96,25 @@ Expr List ::parse(Assoc &env)
     // case E_BEGIN:
     //
     // case E_IF:
-    //     if (this->stxs.size() != 4)
-    //         throw(RuntimeError(""));
-    //     expr1 = this->stxs[1].parse(env);
-    //     expr2 = this->stxs[2].parse(env);
-    //     expr3 = this->stxs[3].parse(env);
-    //     return Expr(new If(expr1, expr2, expr3));
+    //
     // default:
     //     break;
     // }
+    if (identifierPtr->s == "if")
+    {
+        Assoc now = env;
+        while (now.get() && now.get()->x != "if")
+            now = now.get()->next;
+        if (!now.get())
+        {
+            if (this->stxs.size() != 4)
+                throw(RuntimeError(""));
+            expr1 = this->stxs[1].parse(env);
+            expr2 = this->stxs[2].parse(env);
+            expr3 = this->stxs[3].parse(env);
+            return Expr(new If(expr1, expr2, expr3));
+        }
+    }
     if (identifierPtr->s == "quote")
     {
         // if (this->stxs.size() != 2)
