@@ -189,11 +189,12 @@ Expr List ::parse(Assoc &env)
                 List *ls = dynamic_cast<List *>(lsts->stxs[i].get());
                 if (!ls || ls->stxs.size() != 2)
                     throw(RuntimeError(""));
-                Identifier *varId = dynamic_cast<Identifier *>(ls->stxs[0].get());
+                Expr v = ls->stxs[0].parse(env);
+                Var *varId = dynamic_cast<Var *>(v.get());
                 if (!varId)
                     throw(RuntimeError(""));
                 Expr ex = ls->stxs[1].parse(env);
-                bind.push_back({varId->s, ex});
+                bind.push_back({varId->x, ex});
             }
             Expr bd = this->stxs[2].parse(env);
             return Expr(new Let(bind, bd));
