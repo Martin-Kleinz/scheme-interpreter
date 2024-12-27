@@ -89,17 +89,6 @@ Expr List ::parse(Assoc &env)
     std::vector<Expr> bg;
     std::vector<std::string> para;
     Expr expr1 = nullptr, expr2 = nullptr, expr3 = nullptr;
-    // switch (reserved_words[identifierPtr->s])
-    // {
-    // case E_QUOTE:
-    //
-    // case E_BEGIN:
-    //
-    // case E_IF:
-    //
-    // default:
-    //     break;
-    // }
     if (identifierPtr->s == "if")
     {
         Assoc now = env;
@@ -117,9 +106,6 @@ Expr List ::parse(Assoc &env)
     }
     if (identifierPtr->s == "quote")
     {
-        // if (this->stxs.size() != 2)
-        //     throw(RuntimeError(""));
-        // return Expr(new Quote(this->stxs[1]));
         Assoc now = env;
         while (now.get() && now.get()->x != "quote")
             now = now.get()->next;
@@ -166,7 +152,7 @@ Expr List ::parse(Assoc &env)
                 Var *var = dynamic_cast<Var *>(v.get());
                 std::string s = var->x;
                 para.push_back(s);
-                now = Assoc(new AssocList(s, NullV(), now));
+                now = Assoc(new AssocList(s, Value(nullptr), now));
             }
             Expr body = this->stxs[2].parse(now);
             return Expr(new Lambda(para, body));
@@ -192,7 +178,7 @@ Expr List ::parse(Assoc &env)
                     throw(RuntimeError(""));
                 Expr v = ls->stxs[0].parse(env);
                 Var *varId = dynamic_cast<Var *>(v.get());
-                now = Assoc(new AssocList(varId->x, NullV(), now));
+                now = Assoc(new AssocList(varId->x, Value(nullptr), now));
                 if (!varId)
                     throw(RuntimeError(""));
                 Expr ex = ls->stxs[1].parse(env);
@@ -224,7 +210,7 @@ Expr List ::parse(Assoc &env)
                 Var *varId = dynamic_cast<Var *>(v.get());
                 if (!varId)
                     throw(RuntimeError(""));
-                now = Assoc(new AssocList(varId->x, NullV(), now));    
+                now = Assoc(new AssocList(varId->x, Value(nullptr), now));    
                 Expr ex = ls->stxs[1].parse(env);
                 bind.push_back({varId->x, ex});
             }
@@ -232,55 +218,6 @@ Expr List ::parse(Assoc &env)
             return Expr(new Letrec(bind, bd));
         }
     }
-    // switch (primitives[identifierPtr->s])
-    // {
-    // case E_VOID:
-    //     if(this->stxs.size() != 1) throw(RuntimeError(""));
-    //     return new MakeVoid();
-    // case E_EXIT:
-    //     if (this->stxs.size() == 1)
-    //         return Expr(new Exit());
-    //     throw(RuntimeError(""));
-    // case E_CAR:
-    //     if(this->stxs.size() != 2) throw(RuntimeError(""));
-    //     else
-    //     {
-    //         Expr expr = this->stxs[1]->parse(env);
-    //         return Expr(new Car(expr));
-    //     }
-    // case E_CDR:
-    //     if(this->stxs.size() != 2) throw(RuntimeError(""));
-    //     else
-    //     {
-    //         Expr expr = this->stxs[1]->parse(env);
-    //         return Expr(new Cdr(expr));
-    //     }
-    // case E_INTQ:
-    //     if(this->stxs.size() != 2) throw(RuntimeError(""));
-    //     return Expr(new IsFixnum(this->stxs[1].parse(env)));
-    // case E_SYMBOLQ:
-    //     if(this->stxs.size() != 2) throw(RuntimeError(""));
-    //     return Expr(new IsSymbol(this->stxs[1].parse(env)));
-    // case E_BOOLQ:
-    //     if(this->stxs.size() != 2) throw(RuntimeError(""));
-    //     return Expr(new IsBoolean(this->stxs[1].parse(env)));
-    // case E_NULLQ:
-    //     if(this->stxs.size() != 2) throw(RuntimeError(""));
-    //     return Expr(new IsNull(this->stxs[1].parse(env)));
-    // case E_PAIRQ:
-    //     if(this->stxs.size() != 2) throw(RuntimeError(""));
-    //     return Expr(new IsPair(this->stxs[1].parse(env)));
-    // case E_NOT:
-    //     if(this->stxs.size() != 2) throw(RuntimeError(""));
-    //     return Expr(new Not(this->stxs[1].parse(env)));
-    // case E_EQQ:
-    //     if(this->stxs.size() != 3) throw(RuntimeError(""));
-    //     return Expr(new IsEq(this->stxs[1].parse(env), this->stxs[2].parse(env)));
-    // case E_PROCQ:
-    //     if(this->stxs.size() != 2) throw(RuntimeError(""));
-    //     Expr ep = this->stxs[1].parse(env);
-    //     return Expr(new IsProcedure(ep));
-    //}
     Expr vr = this->stxs[0].parse(env);
     std::vector<Expr> es;
     for (int i = 1; i < this->stxs.size(); ++i)
@@ -288,34 +225,7 @@ Expr List ::parse(Assoc &env)
         Expr e = this->stxs[i].parse(env);
         es.push_back(e);
     }
-    //  if (primitives.find(v->x) != primitives.end() || this->stxs.size() == 2)
     return Expr(new Apply(vr, es));
-    // switch (primitives[v->x])
-    // {
-    // case E_PLUS:
-    // case E_MINUS:
-    // case E_MUL:
-    //     return Expr(new Apply(vr, es));
-    // }
-    // if(this->stxs.size() != 3) throw(RuntimeError(""));
-    // expr1 = this->stxs[1].parse(env);
-    // expr2 = this->stxs[2].parse(env);
-    // switch (primitives[identifierPtr->s])
-    // {
-    // case E_LT:
-    //     return Expr(new Less(expr1, expr2));
-    // case E_LE:
-    //     return Expr(new LessEq(expr1, expr2));
-    // case E_EQ:
-    //     return Expr(new Equal(expr1, expr2));
-    // case E_GE:
-    //     return Expr(new GreaterEq(expr1, expr2));
-    // case E_GT:
-    //     return Expr(new Greater(expr1, expr2));
-    // case E_CONS:
-    //     return Expr(new Cons(expr1, expr2));
-    // }
-    // throw(RuntimeError(""));
 }
 
 #endif

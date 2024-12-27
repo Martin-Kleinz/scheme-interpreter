@@ -50,7 +50,7 @@ Value Letrec::eval(Assoc &env)
     Assoc env1 = env;
     for (int i = 0; i < this->bind.size(); ++i)
     {
-        env1 = Assoc(new AssocList(this->bind[i].first, NullV(), env1));
+        env1 = Assoc(new AssocList(this->bind[i].first, Value(nullptr), env1));
     }
     Assoc env2 = env1;
     for (int i = 0; i < this->bind.size(); ++i)
@@ -76,7 +76,10 @@ Value Var::eval(Assoc &e)
     {
         AssocList *node = current.get();
         if (node->x == this->x)
-            return node->v;
+        {
+            if(node->v.get())  return node->v;
+            else throw(RuntimeError(""));
+        }      
         current = node->next;
     }
     std::vector<std::string> Params = {"x", "y"};
