@@ -58,6 +58,13 @@ Value Letrec::eval(Assoc &env)
         Value v = this->bind[i].second->eval(env1);
         env2 = Assoc(new AssocList(this->bind[i].first, v, env2));
     }
+    for(int i = 0; i < this->bind.size(); ++i)
+    {
+        Value v = this->bind[i].second->eval(env2);
+        Assoc cur = env2;
+        while(cur.get()->x != this->bind[i].first) cur = cur.get()->next;
+        cur.get()->v = v;
+    }
     return this->body->eval(env2);
 } // letrec expression
 
